@@ -58,7 +58,13 @@ def solve_it(input_data):
         if last_i_used + 1 < item_count:
             return value + (remaining * densities[last_i_used])
         else:
-            return value
+            return value    
+
+    def optimisticValueSimple(i, remaining):
+        if i >= item_count - 1:
+            return 0
+        else:
+            return remaining * sorted_items[i].density
 
     sorted_items = sorted(items, key = lambda item: -item.density)
     #print sorted_items
@@ -71,10 +77,10 @@ def solve_it(input_data):
             if value > best_value:
                 best_value = value
                 best_taken = taken
-                print "new best", value
+                print("new best", value)
             return value
 
-        if (value + optimisticValue(i, capacity - weight)) < best_value:
+        if (value + optimisticValueSimple(i, capacity - weight)) <= best_value:
             #print "prune"
             return -1
 
@@ -88,7 +94,7 @@ def solve_it(input_data):
 
     taken = [0]*item_count
     for i, item in enumerate(sorted_items):
-        print len(best_taken)
+        print(len(best_taken))
         taken[item.index] = best_taken[i]
     
     # prepare the solution in the specified output format
