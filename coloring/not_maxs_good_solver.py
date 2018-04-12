@@ -15,10 +15,9 @@ solution = None
 def solve_it(input_data):
     global solution
     global sorted_nodes
-    def search(i, color, nodes):
+    def search(i, color, nodes, unused_colors):
         global solution
         global sorted_nodes
-
         #sorted_i = sorted_nodes[i].index
         node = nodes[i]
         node.domain = [color]
@@ -35,9 +34,33 @@ def solve_it(input_data):
             return True
         next_node = min(remaining_nodes, key=lambda node: (len(node.domain) - 0.1 * len(node.neighbors)))
         next_i = next_node.index
-        for color_option in nodes[next_i].domain:    
-            if search(next_i, color_option, deepcopy(nodes)):
+                
+        for color_option in nodes[next_i].domain:  
+            if color_option in unused_colors:
+                unused_colors_copy = copy(unused_colors) 
+                unused_colors_copy.remove(color_option)
+                if search(next_i, color_option, deepcopy(nodes), unused_colors_copy):
+                    return True
+                return False
+            else:
+                if search(next_i, color_option, deepcopy(nodes), unused_colors):
+                    return True
+
+    '''
+            nodes[next_i].domain = nodes[next_i].domain - unused_colors
+            for color_option in nodes[next_i].domain: 
+                if search(next_i, color_option, deepcopy(nodes), unused_colors):
+                        return True
+            if search(next_i, unused_colors[0], deepcopy(nodes), unused_colors[1:]):
                 return True
+            else:
+                return False
+    '''
+
+
+
+
+
 
     def prop_neighbors(i, nodes):
         q = queue.Queue()
@@ -86,7 +109,7 @@ def solve_it(input_data):
             nodes[end].neighbors.append(start)
         sorted_nodes = sorted(nodes, key = lambda node:-len(node.neighbors))
 
-        foundSolution = search(sorted_nodes[0].index,0,nodes)
+        foundSolution = search(sorted_nodes[0].index,0,nodes,list(range(1,n_colors)))
         
         print(solution)
         
