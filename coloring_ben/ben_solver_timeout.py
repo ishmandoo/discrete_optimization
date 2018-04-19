@@ -22,7 +22,7 @@ def solve_it(input_data):
         if time.time() > timeout:
             return False
         domains[i] = [color]
-        if not prop_neighbors(i, domains, neighbors):     
+        if not prop_neighbors(i, domains, neighbors, timeout):     
             return False
 
         remaining_nodes = list(filter(lambda j: len(domains[j]) > 1, range(len(domains))))
@@ -46,7 +46,9 @@ def solve_it(input_data):
 
 
 
-    def prop_neighbors(i, domains, neighbors):
+    def prop_neighbors(i, domains, neighbors, timeout):
+        if time.time() > timeout:
+            return False
         q = queue.Queue()
         q.put(i)
         while not q.empty():
@@ -80,10 +82,11 @@ def solve_it(input_data):
         
     foundSolution = False
 
-    timeout = 30
-    n_colors = node_count // 2
-    top, bot = 0, node_count
-    while not top == bot:
+    timeout = 120
+
+    bot, top = 0, node_count+1
+    while top - bot > 1:
+        n_colors = int(bot+(top-bot)/2)
         print(n_colors, top, bot)
 
         if n_colors > node_count:
@@ -100,11 +103,10 @@ def solve_it(input_data):
 
         foundSolution = search(0,0,domains, neighbors,list(range(1,n_colors)), time.time() + timeout)
 
-        if not foundSolution is None:
-            bot = n_colors
-        else:
+        if foundSolution:
             top = n_colors
-        n_colors = bot + ((top - bot)//2)
+        else:
+            bot = n_colors
 
         
     print(solution)
@@ -112,8 +114,8 @@ def solve_it(input_data):
     
 
     # prepare the solution in the specified output format
-    output_data = str(max([domain[0] for domain in domains])+1) + ' ' + str(1) + '\n'
-    output_data += ' '.join(map(lambda domain: str(domain[0]), domains))
+    output_data = str(max([domain[0] for domain in solution])+1) + ' ' + str(1) + '\n'
+    output_data += ' '.join(map(lambda domain: str(domain[0]), solution))
 
     return output_data
 
