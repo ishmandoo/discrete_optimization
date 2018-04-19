@@ -11,65 +11,49 @@ class Node():
 
     def __repr__(self):
         return "index: {}, neighbors: {}, domain: {}\n".format(self.index,self.neighbors,self.domain)
+
 solution = None
 def solve_it(input_data):
     global solution
-    global sorted_nodes
-    def search(i, color, nodes, unused_colors):
+    def search(i, color, domains, neighbors, unused_colors):
         global solution
-        global sorted_nodes
-        #sorted_i = sorted_nodes[i].index
-        node = nodes[i]
-        node.domain = [color]
-        if not prop_neighbors(i, nodes):     
+        domains[i] = [color]
+        if not prop_neighbors(i, domains, neighbors):     
             return False
 
-        remaining_nodes = list(filter(lambda node: len(node.domain) > 1, nodes))
+        remaining_nodes = list(filter(lambda j: len(domains[j]) > 1, range(len(domains))))
         if len(remaining_nodes) == 0:
-            solution = nodes
+            solution = domains
             return True
-        next_node = min(remaining_nodes, key=lambda node: (len(node.domain) - 0.1 * len(node.neighbors)))
-        next_i = next_node.index
-                
-        for color_option in nodes[next_i].domain:  
+        next_i = min(remaining_nodes, key=lambda j: (len(domains[j]) - 0.1 * len(neighbors[j])))
+
+        for color_option in domains[next_i]:  
             if color_option in unused_colors:
                 unused_colors_copy = copy(unused_colors) 
                 unused_colors_copy.remove(color_option)
-                if search(next_i, color_option, deepcopy(nodes), unused_colors_copy):
+                if search(next_i, color_option, deepcopy(domains), neighbors, unused_colors_copy):
                     return True
                 return False
             else:
-                if search(next_i, color_option, deepcopy(nodes), unused_colors):
+                if search(next_i, color_option, deepcopy(domains), neighbors, unused_colors):
                     return True
-
-    '''
-            nodes[next_i].domain = nodes[next_i].domain - unused_colors
-            for color_option in nodes[next_i].domain: 
-                if search(next_i, color_option, deepcopy(nodes), unused_colors):
-                        return True
-            if search(next_i, unused_colors[0], deepcopy(nodes), unused_colors[1:]):
-                return True
-            else:
-                return False
-    '''
+        
 
 
 
 
-
-
-    def prop_neighbors(i, nodes):
+    def prop_neighbors(i, domains, neighbors):
         q = queue.Queue()
         q.put(i)
         while not q.empty():
             i = q.get()
-            color = nodes[i].domain[0]
-            for neighbor in nodes[i].neighbors:
-                if color in nodes[neighbor].domain:
-                    nodes[neighbor].domain.remove(color)
-                    if len(nodes[neighbor].domain) == 0:
+            color = domains[i][0]
+            for neighbor in neighbors[i]:
+                if color in domains[neighbor]:
+                    domains[neighbor].remove(color)
+                    if len(domains[neighbor]) == 0:
                         return False
-                    if len(nodes[neighbor].domain) == 1:
+                    if len(domains[neighbor]) == 1:
                         q.put(neighbor)
 
         return True
@@ -101,6 +85,9 @@ def solve_it(input_data):
         line = lines[i]
         parts = line.split()
         edges.append((int(parts[0]), int(parts[1])))
+
+    domains = []
+    neighbors = []
         
     foundSolution = False
     n_colors = 0
@@ -112,14 +99,14 @@ def solve_it(input_data):
             break
         
         print("Trying {} colors".format(n_colors))
-        nodes = [Node(i,list(range(n_colors))) for i in range(node_count)]
+        domains = [copy(list(range(n_colors))) for _ in range(node_count)]
+        neighbors = [copy([]) for _ in range(node_count)]
         for edge in edges:
             start, end = edge
-            nodes[start].neighbors.append(end)
-            nodes[end].neighbors.append(start)
-        sorted_nodes = sorted(nodes, key = lambda node:-len(node.neighbors))
+            neighbors[start].append(end)
+            neighbors[end].append(start)
 
-        foundSolution = search(sorted_nodes[0].index,0,nodes,list(range(1,n_colors)))
+        foundSolution = search(0,0,domains, neighbors,list(range(1,n_colors)))
         
         print(solution)
         
@@ -127,7 +114,7 @@ def solve_it(input_data):
 
     # prepare the solution in the specified output format
     output_data = str(n_colors) + ' ' + str(1) + '\n'
-    output_data += ' '.join(map(lambda node: str(node.domain[0]), solution))
+    output_data += ' '.join(map(lambda domain: str(domain[0]), domains))
 
     return output_data
 
