@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy, copy
 import queue
+import networkx as nx
+import matplotlib.pyplot as plt
+import time
 
 class Node():
     def __init__(self, index, domain):
@@ -15,10 +18,31 @@ solution = None
 def solve_it(input_data):
     global solution
     global sorted_nodes
-    def search(i, color, nodes, unused_colors):
+
+    def color_order(i, nodes, unused_colors):
+        node = nodes[i]
+        colors = [color for color in node.domain if color not in unused_colors]
+        color_histogram = [0] * n_colors
+        for neighbor in node.neighbors:
+            for color in nodes[neighbor].domain:
+                color_histogram[color] += 1
+        for color in node.domain:
+            if color_histogram[color] == 0:
+                return [color]
+        colors = sorted(colors, key=lambda color: color_histogram[color])
+        try:
+            colors.insert(0,unused_colors[0])
+        except:
+            pass
+        return colors
+
+
+    def search(i, color, nodes, unused_colors, timeout):
         global solution
         global sorted_nodes
         #sorted_i = sorted_nodes[i].index
+        if time.time() > timeout:
+            return False
         node = nodes[i]
         node.domain = [color]
         if not prop_neighbors(i, nodes):     
@@ -32,37 +56,19 @@ def solve_it(input_data):
         if len(remaining_nodes) == 0:
             solution = nodes
             return True
-        next_node = min(remaining_nodes, key=lambda node: (len(node.domain) - 0.1 * len(node.neighbors)))
+        next_node = min(remaining_nodes, key=lambda node: (len(node.domain) - 0.01 * len(node.neighbors)))
         next_i = next_node.index
-                
-        for color_option in nodes[next_i].domain:  
+
+        for color_option in color_order(next_i, nodes, unused_colors):
             if color_option in unused_colors:
                 unused_colors_copy = copy(unused_colors) 
                 unused_colors_copy.remove(color_option)
-                if search(next_i, color_option, deepcopy(nodes), unused_colors_copy):
+                if search(next_i, color_option, deepcopy(nodes), unused_colors_copy, timeout):
                     return True
-                return False
             else:
-                if search(next_i, color_option, deepcopy(nodes), unused_colors):
+                if search(next_i, color_option, deepcopy(nodes), unused_colors, timeout):
                     return True
-
-        def color_order(domain, unused_colors):
-            colors = [color for color in domain if color not in unused_colors]
-            colors.append(unused_colors[0])
-
-    '''
-            nodes[next_i].domain = nodes[next_i].domain - unused_colors
-            for color_option in nodes[next_i].domain: 
-                if search(next_i, color_option, deepcopy(nodes), unused_colors):
-                        return True
-            if search(next_i, unused_colors[0], deepcopy(nodes), unused_colors[1:]):
-                return True
-            else:
-                return False
-    '''
-
-
-
+        return False
 
 
 
@@ -96,11 +102,24 @@ def solve_it(input_data):
         parts = line.split()
         edges.append((int(parts[0]), int(parts[1])))
         
-    foundSolution = False
-    n_colors = 0
-    while not foundSolution:
-        n_colors += 1
+    # G = nx.Graph()
+    # for node in range(node_count):
+    #     G.add_node(node)
+    # for edge in edges:
+    #     G.add_edge(edges[0], edges[1])
 
+    # pos = nx.draw(G)
+    
+    # plt.show()
+    foundSolution = False
+    floor, ceiling = 0,node_count
+    tryforthismanyseconds = 120
+
+    
+    #while not foundSolution:
+    while (ceiling-floor)>1:
+        n_colors = int(floor+(ceiling-floor)/2)
+        print(n_colors, floor, ceiling)
         if n_colors > node_count:
             print("exiting, more colors  ({}) than nodes ".format(n_colors))
             break
@@ -113,14 +132,18 @@ def solve_it(input_data):
             nodes[end].neighbors.append(start)
         sorted_nodes = sorted(nodes, key = lambda node:-len(node.neighbors))
 
-        foundSolution = search(sorted_nodes[0].index,0,nodes,list(range(1,n_colors)))
+        foundSolution = search(sorted_nodes[0].index,0,nodes,list(range(1,n_colors)), time.time()+tryforthismanyseconds)
         
-        print(solution)
+        if foundSolution:
+            ceiling = n_colors
+        else:
+            floor = n_colors
+    print(solution)
         
     
 
     # prepare the solution in the specified output format
-    output_data = str(n_colors) + ' ' + str(1) + '\n'
+    output_data = str(max([node.domain[0] for node in solution])+1) + ' ' + str(1) + '\n'
     output_data += ' '.join(map(lambda node: str(node.domain[0]), solution))
 
     return output_data

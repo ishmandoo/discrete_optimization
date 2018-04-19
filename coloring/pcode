@@ -1,0 +1,17 @@
+Node(index, neighbors, domain)
+
+solution = False
+
+// search(d, [1], [Node()...])
+search(i, color, nodes):
+	node = nodes[i]
+	node.domain = [color]
+	for neighbor in node.neighbors:
+		if neighbor.domain == node.domain:
+			return False
+	if i == n-1:
+		solution = nodes
+		return True
+	for color_option in nodes[i+1].domain:
+		if search(i+1, color_option, copy(nodes)):
+			return True
