@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy, copy
 import queue
+import time
 
 class Node():
     def __init__(self, index, domain):
@@ -15,10 +16,13 @@ class Node():
 solution = None
 def solve_it(input_data):
     global solution
-    def search(i, color, domains, neighbors, unused_colors):
+    def search(i, color, domains, neighbors, unused_colors, timeout):
         global solution
+
+        if time.time() > timeout:
+            return False
         domains[i] = [color]
-        if not prop_neighbors(i, domains, neighbors):     
+        if not prop_neighbors(i, domains, neighbors, timeout):     
             return False
 
         remaining_nodes = list(filter(lambda j: len(domains[j]) > 1, range(len(domains))))
@@ -28,32 +32,23 @@ def solve_it(input_data):
         next_i = min(remaining_nodes, key=lambda j: (len(domains[j]) - 0.1 * len(neighbors[j])))
 
         for color_option in domains[next_i]:  
-            if not color_option in unused_colors:
-                if search(next_i, color_option, deepcopy(domains), neighbors, unused_colors):
-                    return True
-            else:
-                unused_colors_copy = copy(unused_colors) 
-                unused_colors_copy.remove(color_option)
-                if search(next_i, color_option, deepcopy(domains), neighbors, unused_colors_copy):
-                    return True
-                return False
-        
-        '''
-        for color_option in domains[next_i]:  
             if color_option in unused_colors:
                 unused_colors_copy = copy(unused_colors) 
                 unused_colors_copy.remove(color_option)
-                if search(next_i, color_option, deepcopy(domains), neighbors, unused_colors_copy):
+                if search(next_i, color_option, deepcopy(domains), neighbors, unused_colors_copy, timeout):
                     return True
                 return False
             else:
-                if search(next_i, color_option, deepcopy(domains), neighbors, unused_colors):
+                if search(next_i, color_option, deepcopy(domains), neighbors, unused_colors, timeout):
                     return True
-        '''
+        
 
 
 
-    def prop_neighbors(i, domains, neighbors):
+
+    def prop_neighbors(i, domains, neighbors, timeout):
+        if time.time() > timeout:
+            return False
         q = queue.Queue()
         q.put(i)
         while not q.empty():
@@ -68,21 +63,6 @@ def solve_it(input_data):
                         q.put(neighbor)
 
         return True
-
-
-    def prop_neighbors2(i, nodes):
-        color = nodes[i].domain[0]
-        for neighbor in nodes[i].neighbors:
-            if color in nodes[neighbor].domain:
-                nodes[neighbor].domain.remove(color)
-                if len(nodes[neighbor].domain) == 0:
-                    print("halt")
-
-                    return False
-                if len(nodes[neighbor].domain) == 1:
-                    prop_neighbors2(neighbor, nodes)
-        return True
-
 
     # parse the input
     lines = input_data.split('\n')
@@ -101,9 +81,13 @@ def solve_it(input_data):
     neighbors = []
         
     foundSolution = False
-    n_colors = 0
-    while not foundSolution:
-        n_colors += 1
+
+    timeout = 120
+
+    bot, top = 0, node_count+1
+    while top - bot > 1:
+        n_colors = int(bot+(top-bot)/2)
+        print(n_colors, top, bot)
 
         if n_colors > node_count:
             print("exiting, more colors  ({}) than nodes ".format(n_colors))
@@ -117,17 +101,21 @@ def solve_it(input_data):
             neighbors[start].append(end)
             neighbors[end].append(start)
 
+        foundSolution = search(0,0,domains, neighbors,list(range(1,n_colors)), time.time() + timeout)
 
+        if foundSolution:
+            top = n_colors
+        else:
+            bot = n_colors
 
-        foundSolution = search(0,0,domains, neighbors,list(range(1,n_colors)))
         
-        print(solution)
+    print(solution)
         
     
 
     # prepare the solution in the specified output format
-    output_data = str(n_colors) + ' ' + str(1) + '\n'
-    output_data += ' '.join(map(lambda domain: str(domain[0]), domains))
+    output_data = str(max([domain[0] for domain in solution])+1) + ' ' + str(1) + '\n'
+    output_data += ' '.join(map(lambda domain: str(domain[0]), solution))
 
     return output_data
 
