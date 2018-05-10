@@ -147,27 +147,27 @@ def solve_it(input_data):
 
         print("best value yet: ",bestYet)
 
-    plt.figure()
-    plt.plot(all_lengths,'b')
-    plt.plot(best_lengths,'r')
+    #plt.figure()
+    #plt.plot(all_lengths,'b')
+    #plt.plot(best_lengths,'r')
 
-    plt.figure()
-    plt.plot(temp_list,'b')
+    #plt.figure()
+    #plt.plot(temp_list,'b')
 
     # calculate the length of the tour
-    obj = total_length(points, nodeCount, solution)
-    plt.figure()
-    draw_solution(points, nodeCount, bestSol, bestSol)
+    #obj = total_length(points, nodeCount, solution)
+    #plt.figure()
+    #draw_solution(points, nodeCount, bestSol, bestSol)
 
     #plt.show()
 
-    if obj > bestYet:
-        obj = bestYet
-        solution = copy(bestSol)
+    #if obj > bestYet:
+    #    obj = bestYet
+    #    solution = copy(bestSol)
 
     # prepare the solution in the specified output format
-    output_data = '%.2f' % obj + ' ' + str(0) + '\n'
-    output_data += ' '.join(map(str, solution))
+    output_data = '%.2f' % total_length(points, nodeCount, bestSol) + ' ' + str(0) + '\n'
+    output_data += ' '.join(map(str, bestSol))
 
     return output_data
 
