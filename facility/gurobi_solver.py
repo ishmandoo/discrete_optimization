@@ -53,6 +53,7 @@ def solve_it(input_data):
 
     # Add constraint: x + y >= 1
     #m.addConstr(x + y >= 1, "c1")
+    m.setParam('TimeLimit', 1.0)
 
     m.optimize()
     solution = []
