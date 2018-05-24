@@ -3,6 +3,9 @@
 from copy import deepcopy, copy
 import queue
 import time
+import sys
+sys.setrecursionlimit(2000)
+
 
 class Node():
     def __init__(self, index, domain):
@@ -16,6 +19,21 @@ class Node():
 solution = None
 def solve_it(input_data):
     global solution
+    def search_greedy(node_count, domains, neighbors):
+        global solution
+        for i in range(node_count):
+            color = None
+            test_color = 0
+            while color is None:
+                if all([not domains[neighbor] == [test_color] for neighbor in neighbors[i]]):
+                    color = test_color
+                else:        
+                    test_color += 1
+
+            domains[i] = [color]
+
+        solution = domains
+
     def search(i, color, domains, neighbors, unused_colors, timeout):
         global solution
 
@@ -71,20 +89,34 @@ def solve_it(input_data):
     node_count = int(first_line[0])
     edge_count = int(first_line[1])
 
+    print("{} nodes, {} edges".format(node_count, edge_count))
+
     edges = []
     for i in range(1, edge_count + 1):
         line = lines[i]
         parts = line.split()
         edges.append((int(parts[0]), int(parts[1])))
 
+
+
     domains = []
     neighbors = []
-        
-    foundSolution = False
 
-    timeout = 120
+    domains = [copy(list(range(node_count))) for _ in range(node_count)]
+    neighbors = [copy([]) for _ in range(node_count)]
+    for edge in edges:
+        start, end = edge
+        neighbors[start].append(end)
+        neighbors[end].append(start)
 
-    bot, top = 0, node_count+1
+    search_greedy(node_count, domains, neighbors)
+
+    greedy_n_colors = max([domain[0] for domain in solution])+1
+    print(solution)
+    print("found greedy solution with {} colors".format(greedy_n_colors))
+    timeout = 60
+
+    bot, top = 0, greedy_n_colors
     while top - bot > 1:
         n_colors = int(bot+(top-bot)/2)
         print(n_colors, top, bot)
