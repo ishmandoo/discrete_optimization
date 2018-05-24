@@ -38,12 +38,12 @@ def solve_it(input_data):
     facility_vars = [m.addVar(vtype=GRB.BINARY, name="fac_%d"%i) for i in range(facility_count)]
     edge_vars = [[m.addVar(vtype=GRB.BINARY, name="edge_%d_%d"%(i, j)) for j in range(facility_count)] for i in range(customer_count)]
     
-    obj = 0
-    obj += sum([facility.setup_cost * facility_var for facility, facility_var in zip(facilities, facility_vars)])
-    obj += sum([length(customers[i].location, facilities[j].location) * edge_vars[i][j] for j in range(facility_count) for i in range(customer_count)])
+    obj_fn = 0
+    obj_fn += sum([facility.setup_cost * facility_var for facility, facility_var in zip(facilities, facility_vars)])
+    obj_fn += sum([length(customers[i].location, facilities[j].location) * edge_vars[i][j] for j in range(facility_count) for i in range(customer_count)])
     
     # Set objective
-    m.setObjective(obj, GRB.MINIMIZE)
+    m.setObjective(obj_fn, GRB.MINIMIZE)
 
     # Add constraint: 
 
@@ -61,13 +61,14 @@ def solve_it(input_data):
     for facility_index in solution:
         used[facility_index] = 1
 
-    # calculate the cost of the solution
-    obj = sum([f.setup_cost*used[f.index] for f in facilities])
-    for customer in customers:
-        obj += length(customer.location, facilities[solution[customer.index]].location)
+    for i in range(customer_count):
+        for j in range(facility_count):
+            if edge_vars[i][j].x == 1:
+                solution.append(j)
+
 
     # prepare the solution in the specified output format
-    output_data = '%.2f' % obj + ' ' + str(0) + '\n'
+    output_data = '%.2f' % m.objVal + ' ' + str(0) + '\n'
     output_data += ' '.join(map(str, solution))
 
     return output_data
