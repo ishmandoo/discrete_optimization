@@ -46,14 +46,15 @@ def solve_it(input_data):
     # for v in m.getVars():
     #     print('%s %g' % (v.varName, v.x))
 
-    print('Obj: %g' % m.objVal)
+    print("quality")
+    m.printQuality()
 
     
 
 
 
     # prepare the solution in the specified output format
-    output_data = str(m.objVal) + ' ' + str(0) + '\n'
+    output_data = str(int(m.objVal)) + ' ' + str(0) + '\n'
     output_data += ' '.join(map(lambda var:str(int(var.x)), gurobiVars))
     return output_data
 
