@@ -40,9 +40,18 @@ def solve_it(input_data):
     print("Building edge vars: ",customer_count)
     edge_vars = [[m.addVar(vtype=GRB.BINARY, name="edge_%d_%d"%(i, j)) for j in range(facility_count)] for i in range(customer_count)]
     
+<<<<<<< HEAD
     print("Building obj_fn")
     obj_fn = 0
     obj_fn += quicksum([facility.setup_cost * facility_var for facility, facility_var in zip(facilities, facility_vars)])
+=======
+    obj_fn = 0    
+
+    print("Building obj fixed")
+    obj_fn += quicksum([facility.setup_cost * facility_var for facility, facility_var in zip(facilities, facility_vars)])    
+    
+    print("Building obj distance")
+>>>>>>> db3a7f812ae3d503be0180f4cb364f96b14d00a5
     obj_fn += quicksum([length(customers[i].location, facilities[j].location) * edge_vars[i][j] for j in range(facility_count) for i in range(customer_count)])
     
     # Set objective
@@ -56,7 +65,9 @@ def solve_it(input_data):
 
     [m.addConstr(quicksum([edge_vars[i][j]*customers[i].demand for i in range(customer_count)]) <= facilities[j].capacity*facility_vars[j]) for j in range(facility_count)]
 
-    m.setParam('TimeLimit', 1.0)
+    [m.addConstr(edge_vars[i][j] <= facility_vars[j]) for i in range(customer_count) for j in range(facility_count)]
+
+    m.setParam('TimeLimit', 60.0)
 
     print("Optimizing")
     m.optimize()
