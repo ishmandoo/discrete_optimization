@@ -1245,3 +1245,83 @@ Solution count 5: 2.75092e+07 2.87043e+07 1.2846e+08 ... 2.1553e+08
 Solve interrupted
 Best objective 2.750922481202e+07, best bound 1.965813781354e+07, gap 28.5398%
 Freed default Gurobi environment
+
+Gurobi 8.0.0 (linux64, Python) logging started Wed May 23 22:17:50 2018
+
+Changed value of parameter TimeLimit to 1.0
+   Prev: 1e+100  Min: 0.0  Max: 1e+100  Default: 1e+100
+Optimize a model with 200 rows, 10100 columns and 20100 nonzeros
+Variable types: 0 continuous, 10100 integer (10100 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 3e+02]
+  Objective range  [2e+00, 3e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Freed default Gurobi environment
+
+Gurobi 8.0.0 (linux64, Python) logging started Wed May 23 22:18:05 2018
+
+Changed value of parameter TimeLimit to 1.0
+   Prev: 1e+100  Min: 0.0  Max: 1e+100  Default: 1e+100
+Optimize a model with 1000 rows, 160200 columns and 320200 nonzeros
+Variable types: 0 continuous, 160200 integer (160200 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 7e+03]
+  Objective range  [4e+01, 1e+05]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Freed default Gurobi environment
+
+Gurobi 8.0.0 (linux64, Python) logging started Wed May 23 22:18:16 2018
+
+Changed value of parameter TimeLimit to 1.0
+   Prev: 1e+100  Min: 0.0  Max: 1e+100  Default: 1e+100
+Optimize a model with 200 rows, 10100 columns and 20100 nonzeros
+Variable types: 0 continuous, 10100 integer (10100 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 3e+02]
+  Objective range  [2e+00, 3e+02]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Freed default Gurobi environment
+
+Gurobi 8.0.0 (linux64, Python) logging started Wed May 23 22:18:22 2018
+
+
+Gurobi 8.0.0 (linux64, Python) logging started Wed May 23 22:20:55 2018
+
+Freed default Gurobi environment
+
+Gurobi 8.0.0 (linux64, Python) logging started Wed May 23 22:30:04 2018
+
+Freed default Gurobi environment
+
+Gurobi 8.0.0 (linux64, Python) logging started Wed May 23 22:30:51 2018
+
+Changed value of parameter TimeLimit to 1.0
+   Prev: 1e+100  Min: 0.0  Max: 1e+100  Default: 1e+100
+Optimize a model with 2500 rows, 1501000 columns and 3001000 nonzeros
+Variable types: 0 continuous, 1501000 integer (1501000 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 7e+03]
+  Objective range  [4e+01, 3e+05]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Freed default Gurobi environment
+
+Gurobi 8.0.0 (linux64, Python) logging started Wed May 23 22:31:30 2018
+
+Freed default Gurobi environment
+
+Gurobi 8.0.0 (linux64, Python) logging started Wed May 23 22:32:11 2018
+
+Changed value of parameter TimeLimit to 1.0
+   Prev: 1e+100  Min: 0.0  Max: 1e+100  Default: 1e+100
+Optimize a model with 3500 rows, 1500500 columns and 3000500 nonzeros
+Variable types: 0 continuous, 1500500 integer (1500500 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 8e+03]
+  Objective range  [6e+01, 3e+05]
+  Bounds range     [1e+00, 1e+00]
+  RHS range        [1e+00, 1e+00]
+Freed default Gurobi environment

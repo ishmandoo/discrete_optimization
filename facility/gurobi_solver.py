@@ -34,16 +34,16 @@ def solve_it(input_data):
         customers.append(Customer(i-1-facility_count, int(parts[0]), Point(float(parts[1]), float(parts[2]))))
 
     m = Model("mip1")
-    print("Building fac vars")
+    print("Building fac vars: ",facility_count)
     facility_vars = [m.addVar(vtype=GRB.BINARY, name="fac_%d"%i) for i in range(facility_count)]
 
-    print("Building edge vars")
+    print("Building edge vars: ",customer_count)
     edge_vars = [[m.addVar(vtype=GRB.BINARY, name="edge_%d_%d"%(i, j)) for j in range(facility_count)] for i in range(customer_count)]
     
     print("Building obj_fn")
     obj_fn = 0
-    obj_fn += sum([facility.setup_cost * facility_var for facility, facility_var in zip(facilities, facility_vars)])
-    obj_fn += sum([length(customers[i].location, facilities[j].location) * edge_vars[i][j] for j in range(facility_count) for i in range(customer_count)])
+    obj_fn += quicksum([facility.setup_cost * facility_var for facility, facility_var in zip(facilities, facility_vars)])
+    obj_fn += quicksum([length(customers[i].location, facilities[j].location) * edge_vars[i][j] for j in range(facility_count) for i in range(customer_count)])
     
     # Set objective
     print("Setting objective")
@@ -52,9 +52,9 @@ def solve_it(input_data):
     # Add constraint: 
 
     print("Adding constraints")
-    [m.addConstr(sum([edge_vars[i][j] for j in range(facility_count)]) == 1) for i in range(customer_count)]
+    [m.addConstr(quicksum([edge_vars[i][j] for j in range(facility_count)]) == 1) for i in range(customer_count)]
 
-    [m.addConstr(sum([edge_vars[i][j]*customers[i].demand for i in range(customer_count)]) <= facilities[j].capacity*facility_vars[j]) for j in range(facility_count)]
+    [m.addConstr(quicksum([edge_vars[i][j]*customers[i].demand for i in range(customer_count)]) <= facilities[j].capacity*facility_vars[j]) for j in range(facility_count)]
 
     m.setParam('TimeLimit', 1.0)
 
