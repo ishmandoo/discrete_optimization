@@ -147,6 +147,8 @@ def solve_it(input_data):
 	m._acts = acts	
 	m._edges = edges
 
+	m.setParam('TimeLimit', 60.0)
+
 	m.Params.lazyConstraints = 1
 	m.optimize(subtourelim)
 
