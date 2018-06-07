@@ -65,7 +65,9 @@ def solve_it(input_data):
 	for v in range(vehicle_count):
 		for c in range(customer_count):
 			m.addConstr(acts[c,v] <= acts[0,v])
-	
+	#break vehicle symmettry
+	for v in range(vehicle_count-1):
+		m.addConstr(acts[0,v] >= acts[0,v+1])
 
 	# unactivated customers can't have edges selected
 	for c1 in range(customer_count):
