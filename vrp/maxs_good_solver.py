@@ -92,18 +92,22 @@ def solve_it(input_data):
 					sol = model.cbGetSolution([model._edges[c1,c2,v] for c2 in range(customer_count)])
 					selected += [(c1,c2) for c2 in range(customer_count) if sol[c2] > 0.5]
 				# find the shortest cycle in the selected edge list
-				tour = subtour(selected)
-				if len(tour) < len(selected):
+				tour = subtour(selected,customer_count)
+				if 2*len(tour) < len(selected):
 				  # add a subtour elimination constraint
 					expr = 0
 					for c1 in range(len(tour)):
 						for c2 in range(c1+1, len(tour)):
-							expr += model._vars[tour[c1], tour[c2], v]
+							expr += model._edges[tour[c1], tour[c2], v]
+					#print("expr",expr)
 					model.cbLazy(expr <= len(tour)-1)
 
 
-	def subtour(edges):
-		n = len(edges)
+	def subtour(edges,customer_count):
+		if len(edges)==0:
+			return([])
+		#print(edges)
+		n = customer_count
 		visited = [False] * n
 		cycles = []
 		lengths = []
@@ -120,10 +124,16 @@ def solve_it(input_data):
 					break
 				current = neighbors[0]
 				thiscycle.append(current)
-			cycles.append(thiscycle)
-			lengths.append(len(thiscycle))
+			#cycles.append(thiscycle)
+			#lengths.append(len(thiscycle))
+			if len(thiscycle)>1:
+				lengths.append(len(thiscycle))
+				cycles.append(thiscycle)
+				break
 			if sum(lengths) == n:
 				break
+		#print("cycles",cycles)
+		#print("cycles",cycles[lengths.index(min(lengths))])
 		return cycles[lengths.index(min(lengths))]
 
 
@@ -141,12 +151,15 @@ def solve_it(input_data):
 	for v in range(vehicle_count):
 		selected = []
 		for c1 in range(customer_count):
-			sol = [m._edges[c1,c2,v].x for c2 in range(customer_count)]
-			print sol
+			sol = [edges[c1,c2,v].x for c2 in range(customer_count)]
 			selected += [(c1,c2) for c2 in range(customer_count) if sol[c2] > 0.5]
 		# find the shortest cycle in the selected edge list
-		tour = subtour(selected)
-		outputData += str(depot.index) + ' ' + ' '.join([str(customer.index) for customer in tour[v]]) + ' ' + str(depot.index) + '\n'
+		#print("sel: ",selected)
+		if selected != []:
+			tour = subtour(selected,customer_count)
+			#print("tour: ",tour)
+			outputData += str(depot.index) + ' ' + ' '.join([str(customer) for customer in tour]) + ' ' + str(depot.index) + '\n'
+			"""outputData += str(depot.index) + ' ' + ' '.join([str(customer) for customer in tour[1:]]) + ' ' + str(depot.index) + '\n'"""
 
 	return outputData
 
