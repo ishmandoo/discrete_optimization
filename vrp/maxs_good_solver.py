@@ -58,9 +58,13 @@ def solve_it(input_data):
 			edges[c,c,v].ub = 0
 	
 	# only one vehicle can visit each customer except for the depot
-	m.addConstr(quicksum(acts[0,v] for v in range(vehicle_count)) == vehicle_count)
+	#m.addConstr(quicksum(acts[0,v] for v in range(vehicle_count)) == vehicle_count)
 	for c in range(1,customer_count):
 		m.addConstr(quicksum(acts[c,v] for v in range(vehicle_count)) == 1)
+
+	for v in range(vehicle_count):
+		for c in range(customer_count):
+			m.addConstr(acts[c,v] <= acts[0,v])
 	
 
 	# unactivated customers can't have edges selected
@@ -73,7 +77,7 @@ def solve_it(input_data):
 	for v in range(vehicle_count):
 		m.addConstr(quicksum(edges[0,c2,v] 
 			for c2 in range(customer_count)
-			) <= 2)
+			) == 2*acts[0,v])
 	for c1 in range(1,customer_count):
 		m.addConstr(quicksum(edges[c1,c2,v] 
 			for c2 in range(customer_count) 
@@ -158,8 +162,8 @@ def solve_it(input_data):
 		if selected != []:
 			tour = subtour(selected,customer_count)
 			#print("tour: ",tour)
-			outputData += str(depot.index) + ' ' + ' '.join([str(customer) for customer in tour]) + ' ' + str(depot.index) + '\n'
-			"""outputData += str(depot.index) + ' ' + ' '.join([str(customer) for customer in tour[1:]]) + ' ' + str(depot.index) + '\n'"""
+			#outputData += str(depot.index) + ' ' + ' '.join([str(customer) for customer in tour]) + ' ' + str(depot.index) + '\n'
+			outputData += ' '.join([str(customer) for customer in tour]) + ' ' + str(depot.index) + '\n'
 
 	return outputData
 
